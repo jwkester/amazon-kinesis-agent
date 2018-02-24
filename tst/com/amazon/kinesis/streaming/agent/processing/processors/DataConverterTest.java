@@ -213,7 +213,40 @@ public class DataConverterTest {
         final String expectedStr = "{\"metadata\":{\"foo\":{\"bar\":\"bas\"},\"key\":\"value\"},\"data\":\"This is the data\"}\n";
         verifyDataConversion(converter, dataStr.getBytes(), expectedStr.getBytes()); 
     }
-    
+
+    @Test
+    public void testSplunkMetadataConverter() throws Exception {
+        final Configuration config = new Configuration(new HashMap<String, Object>() {{
+            put("optionName", "SPLUNKMETADATA");
+            put("splunkdata", new HashMap<String, Object>() {{
+                put("key", "value");
+                put("key1", "value1");
+            }});
+        }});
+        final IDataConverter converter = new SplunkMetadataConverter(config);
+        final String dataStr = "This is the data";
+        final String expectedStr = "{\"key1\":\"value1\",\"key\":\"value\",\"event\":\"This is the data\"}\n";
+        verifyDataConversion(converter, dataStr.getBytes(), expectedStr.getBytes());
+    }
+
+    @Test
+    public void testSplunkMetadataConverterJsonEvent() throws Exception {
+        final Configuration config = new Configuration(new HashMap<String, Object>() {{
+            put("optionName", "SPLUNKMETADATA");
+            put("splunkdata", new HashMap<String, Object>() {{
+                put("time", 1426279439);
+                put("host", "localhost");
+                put("source", "datasource");
+                put("sourcetype", "txt");
+                put("index", "main");
+            }});
+        }});
+        final IDataConverter converter = new SplunkMetadataConverter(config);
+        final String dataStr = "{\"Hello\":\"world\"}";
+        final String expectedStr = "{\"host\":\"localhost\",\"index\":\"main\",\"sourcetype\":\"txt\",\"time\":1426279439,\"source\":\"datasource\",\"event\":\"{\\\"Hello\\\":\\\"world\\\"}\"}\n";
+        verifyDataConversion(converter, dataStr.getBytes(), expectedStr.getBytes());
+    }
+
     private void verifyDataConversion(IDataConverter converter, byte[] dataBin, byte[] expectedBin) throws Exception {
         ByteBuffer data = ByteBuffer.wrap(dataBin);
         ByteBuffer res = converter.convert(data);

@@ -13,8 +13,6 @@
  */
 package com.amazon.kinesis.streaming.agent.processing.utils;
 
-import java.util.List;
-
 import com.amazon.kinesis.streaming.agent.config.Configuration;
 import com.amazon.kinesis.streaming.agent.config.ConfigurationException;
 import com.amazon.kinesis.streaming.agent.processing.interfaces.IDataConverter;
@@ -22,12 +20,9 @@ import com.amazon.kinesis.streaming.agent.processing.interfaces.IJSONPrinter;
 import com.amazon.kinesis.streaming.agent.processing.interfaces.ILogParser;
 import com.amazon.kinesis.streaming.agent.processing.parsers.ApacheLogParser;
 import com.amazon.kinesis.streaming.agent.processing.parsers.SysLogParser;
-import com.amazon.kinesis.streaming.agent.processing.processors.AddEC2MetadataConverter;
-import com.amazon.kinesis.streaming.agent.processing.processors.AddMetadataConverter;
-import com.amazon.kinesis.streaming.agent.processing.processors.BracketsDataConverter;
-import com.amazon.kinesis.streaming.agent.processing.processors.CSVToJSONDataConverter;
-import com.amazon.kinesis.streaming.agent.processing.processors.LogToJSONDataConverter;
-import com.amazon.kinesis.streaming.agent.processing.processors.SingleLineDataConverter;
+import com.amazon.kinesis.streaming.agent.processing.processors.*;
+
+import java.util.List;
 
 /**
  * The factory to create: 
@@ -44,6 +39,7 @@ public class ProcessingUtilsFactory {
     public static enum DataConversionOption {
         ADDMETADATA,
         ADDEC2METADATA,
+        SPLUNKMETADATA,
         SINGLELINE,
         CSVTOJSON,
         LOGTOJSON,
@@ -121,6 +117,8 @@ public class ProcessingUtilsFactory {
                 return new AddMetadataConverter(config);
             case ADDEC2METADATA:
                 return new AddEC2MetadataConverter(config);
+            case SPLUNKMETADATA:
+                return new SplunkMetadataConverter(config);
             case SINGLELINE:
                 return new SingleLineDataConverter();
             case CSVTOJSON:
